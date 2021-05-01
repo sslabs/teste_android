@@ -1,31 +1,21 @@
 package dev.dextra.newsapp.feature.news
 
+import androidx.lifecycle.MutableLiveData
+import dev.dextra.newsapp.api.model.Article
 import dev.dextra.newsapp.api.model.Source
 import dev.dextra.newsapp.api.repository.NewsRepository
 import dev.dextra.newsapp.base.BaseViewModel
 
+class NewsViewModel(private val newsRepository: NewsRepository) : BaseViewModel() {
 
-class NewsViewModel(
-    private val newsRepository: NewsRepository,
-    private val newsActivity: NewsActivity
-) : BaseViewModel() {
+    val articles = MutableLiveData<List<Article>>()
 
-    private var source: Source? = null
-
-    fun configureSource(source: Source) {
-        this.source = source
-    }
-
-    fun loadNews() {
-        newsActivity.showLoading()
+    fun loadNews(source: Source) {
         addDisposable(
-            newsRepository.getEverything(source!!.id).subscribe({ response ->
-                newsActivity.showData(response.articles)
-                newsActivity.hideLoading()
-            },
-                {
-                    newsActivity.hideLoading()
-                })
+            newsRepository.getEverything(source.id)
+                .subscribe { response ->
+                    articles.postValue(response.articles)
+                }
         )
     }
 }

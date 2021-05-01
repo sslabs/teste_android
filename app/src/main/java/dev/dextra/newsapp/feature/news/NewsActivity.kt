@@ -6,20 +6,20 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.Window
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
 import dev.dextra.newsapp.R
 import dev.dextra.newsapp.api.model.Article
 import dev.dextra.newsapp.api.model.Source
-import dev.dextra.newsapp.api.repository.NewsRepository
-import dev.dextra.newsapp.base.repository.EndpointService
 import dev.dextra.newsapp.feature.news.adapter.ArticleListAdapter
 import kotlinx.android.synthetic.main.activity_news.*
+import org.koin.android.ext.android.inject
 
 
 const val NEWS_ACTIVITY_SOURCE = "NEWS_ACTIVITY_SOURCE"
 
 class NewsActivity : AppCompatActivity() {
 
-    private val newsViewModel = NewsViewModel(NewsRepository(EndpointService()), this)
+    private val newsViewModel: NewsViewModel by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setContentView(R.layout.activity_news)
@@ -30,13 +30,18 @@ class NewsActivity : AppCompatActivity() {
             loadNews(source)
         }
 
+        newsViewModel.articles.observe(this, Observer {
+            showData(it)
+            hideLoading()
+        });
+
         super.onCreate(savedInstanceState)
 
     }
 
     private fun loadNews(source: Source) {
-        newsViewModel.configureSource(source)
-        newsViewModel.loadNews()
+        showLoading()
+        newsViewModel.loadNews(source)
     }
 
     fun onClick(article: Article) {
@@ -47,7 +52,7 @@ class NewsActivity : AppCompatActivity() {
 
     private var loading: Dialog? = null
 
-    fun showLoading() {
+    private fun showLoading() {
         if (loading == null) {
             loading = Dialog(this)
             loading?.apply {
@@ -59,11 +64,11 @@ class NewsActivity : AppCompatActivity() {
         loading?.show()
     }
 
-    fun hideLoading() {
+    private fun hideLoading() {
         loading?.dismiss()
     }
 
-    fun showData(articles: List<Article>) {
+    private fun showData(articles: List<Article>) {
         val viewAdapter = ArticleListAdapter(this@NewsActivity, this@NewsActivity, articles)
         news_list.adapter = viewAdapter
     }
