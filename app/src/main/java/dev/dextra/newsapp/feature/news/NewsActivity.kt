@@ -4,14 +4,19 @@ import android.app.Dialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.view.View
 import android.view.Window
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import dev.dextra.newsapp.R
 import dev.dextra.newsapp.api.model.Article
 import dev.dextra.newsapp.api.model.Source
 import dev.dextra.newsapp.feature.news.adapter.ArticleListAdapter
 import kotlinx.android.synthetic.main.activity_news.*
+import kotlinx.android.synthetic.main.activity_sources.*
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 
 
@@ -20,6 +25,7 @@ const val NEWS_ACTIVITY_SOURCE = "NEWS_ACTIVITY_SOURCE"
 class NewsActivity : AppCompatActivity() {
 
     private val newsViewModel: NewsViewModel by inject()
+    private val newsAdapter = ArticleListAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setContentView(R.layout.activity_news)
@@ -27,13 +33,37 @@ class NewsActivity : AppCompatActivity() {
         (intent?.extras?.getSerializable(NEWS_ACTIVITY_SOURCE) as Source).let { source ->
             title = source.name
 
+//            newsViewModel.source = source
+
+            news_list.apply {
+                setHasFixedSize(true)
+                adapter = newsAdapter
+            }
+
             loadNews(source)
+            newsViewModel.flow.subscribe {
+                newsAdapter.submitData(lifecycle, it)
+                hideLoading()
+            }
+
+
+//            lifecycleScope.launch {
+//                newsViewModel.flow.collectLatest { pagingData ->
+//                    newsAdapter.submitData(pagingData)
+//                    hideLoading()
+//                }
+//            }
         }
 
-        newsViewModel.articles.observe(this, Observer {
-            showData(it)
-            hideLoading()
-        });
+//        news_list.apply {
+//            setHasFixedSize(true)
+//            adapter = newsAdapter
+//        }
+
+//        newsViewModel.articles.observe(this, Observer {
+//            showData(it)
+//            hideLoading()
+//        });
 
         super.onCreate(savedInstanceState)
 
@@ -69,7 +99,7 @@ class NewsActivity : AppCompatActivity() {
     }
 
     private fun showData(articles: List<Article>) {
-        val viewAdapter = ArticleListAdapter(this@NewsActivity, this@NewsActivity, articles)
-        news_list.adapter = viewAdapter
+//        val viewAdapter = ArticleListAdapter(this@NewsActivity, this@NewsActivity, articles)
+//        news_list.adapter = viewAdapter
     }
 }

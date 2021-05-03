@@ -2,7 +2,10 @@ package dev.dextra.newsapp.api.repository
 
 import dev.dextra.newsapp.api.model.ArticlesResponse
 import dev.dextra.newsapp.api.model.SourceResponse
+import io.reactivex.Flowable
 import io.reactivex.Single
+import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
 

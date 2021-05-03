@@ -1,6 +1,7 @@
 package dev.dextra.newsapp.base
 
 import dev.dextra.newsapp.api.repository.NewsRepository
+import dev.dextra.newsapp.api.repository.PagingArticleSource
 import dev.dextra.newsapp.base.repository.EndpointService
 import dev.dextra.newsapp.feature.news.NewsViewModel
 import dev.dextra.newsapp.feature.sources.SourcesViewModel
@@ -19,6 +20,7 @@ val serviceModules = module {
 
 val repositoryModules = module {
     single { NewsRepository(get()) }
+//    factory { params -> PagingArticleSource(endpointService = get(), sources = params.get()) }
 }
 
 val appComponent: List<Module> = listOf(viewModelModules, serviceModules, repositoryModules)
