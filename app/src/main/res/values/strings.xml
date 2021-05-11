@@ -21,4 +21,6 @@
     <string name="error_state_subtitle_news">We had a problem loading the News list, please check your internet connection and click the button to retry</string>
 
     <string name="error_state_retry">Retry</string>
+
+    <string name="error_no_more_articles">Could not get any more articles</string>
 </resources>

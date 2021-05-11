@@ -1,44 +1,50 @@
 package dev.dextra.newsapp.feature.news.adapter
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
+import androidx.recyclerview.widget.RecyclerView
 import dev.dextra.newsapp.R
 import dev.dextra.newsapp.api.model.Article
-import dev.dextra.newsapp.feature.news.NewsActivity
 import kotlinx.android.synthetic.main.item_article.view.*
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
 class ArticleListAdapter(
-    context: Context,
-    val listener: NewsActivity,
-    articles: List<Article>) : ArrayAdapter<Article>(context, 0, articles) {
+    private val clickListener: ArticleClickListener,
+) : RecyclerView.Adapter<ArticleListAdapter.ArticleViewHolder>() {
 
     private val dateFormat = SimpleDateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT)
     private val parseFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
+    private val dataset = ArrayList<Article>()
 
-    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+    override fun getItemCount(): Int = dataset.size
 
-        val article = getItem(position)
-
-        var convertView2 = convertView
-
-        if (convertView2 == null) {
-            convertView2 = LayoutInflater.from(getContext()).inflate(R.layout.item_article, parent, false)
+    override fun onBindViewHolder(holder: ArticleViewHolder, position: Int) {
+        dataset[position].apply {
+            holder.view.article_name.text = this.title
+            holder.view.article_description.text = this.description
+            holder.view.article_author.text = this.author
+            holder.view.article_date.text = dateFormat.format(parseFormat.parse(this.publishedAt))
+            holder.view.setOnClickListener{ clickListener.onClick(this) }
         }
+    }
 
-        if(convertView2!=null){
-            convertView2.rootView.article_name.text = article.title
-            convertView2.rootView.article_description.text = article.description
-            convertView2.rootView.article_author.text = article.author
-            convertView2.rootView.article_date.text = dateFormat.format(parseFormat.parse(article.publishedAt))
-            convertView2.setOnClickListener{listener.onClick(article)}
-        }
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ArticleViewHolder {
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_article, parent, false)
+        return ArticleViewHolder(view)
+    }
 
-        return convertView2!!
+    fun add(articles: List<Article>) {
+        dataset.addAll(articles)
+        notifyDataSetChanged()
+    }
+
+    class ArticleViewHolder(val view: View) : RecyclerView.ViewHolder(view)
+
+    interface ArticleClickListener {
+        fun onClick(article: Article)
     }
 }

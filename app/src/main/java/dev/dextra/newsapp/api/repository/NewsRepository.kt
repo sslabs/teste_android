@@ -6,7 +6,8 @@ import dev.dextra.newsapp.base.repository.EndpointService
 import dev.dextra.newsapp.base.repository.Repository
 import io.reactivex.Single
 
-class NewsRepository(endpointService: EndpointService) : Repository<NewsEndpoint>(endpointService) {
+class NewsRepository(endpointService: EndpointService)
+    : Repository<NewsEndpoint>(endpointService) {
 
     fun getSources(country: String?, category: String?): Single<SourceResponse> {
         return schedule(getEndpoint().getSources(country, category))

@@ -20,12 +20,12 @@ class SourcesViewModel(private val newsRepository: NewsRepository) : BaseViewMod
         networkState.postValue(NetworkState.RUNNING)
         addDisposable(
             newsRepository.getSources(
-                selectedCountry!!.name.toLowerCase(),
-                selectedCategory!!.name.toLowerCase()
+                selectedCountry?.name?.toLowerCase(),
+                selectedCategory?.name?.toLowerCase()
             ).subscribe({
                 sources.postValue(it.sources)
                 if (it.sources.isEmpty()) {
-                    networkState.postValue(NetworkState.ERROR)
+                    networkState.postValue(NetworkState.EMPTY)
                 } else {
                     networkState.postValue(NetworkState.SUCCESS)
                 }
@@ -35,7 +35,7 @@ class SourcesViewModel(private val newsRepository: NewsRepository) : BaseViewMod
         )
     }
 
-    fun changeCountry(country: Country?) {
+    fun changeCountry(country: Country) {
         if (Country.ALL.equals(country)) selectedCountry = null
         else selectedCountry = country
         loadSources()

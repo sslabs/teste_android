@@ -87,12 +87,16 @@ project.afterEvaluate {
                                                'outputs/code_coverage/debugAndroidTest/connected/**/*.ec'])
                         }
 
-                        sourceDirectories = files([javaSrc, kotlinSrc])
-                        classDirectories = files([javaClasses, kotlinClasses])
+                        sourceDirectories.from files(["$project.projectDir/src/main/java"])
+                        classDirectories.setFrom(files(classDirectories.files.collect {
+                            fileTree(dir: it, exclude: 'com/exclude/**')
+                        }))
 
                         print execution
 
-                        executionData = files(execution)
+                        executionData.from fileTree(dir: project.buildDir, includes: [
+                                'jacoco/testDebugUnitTest.exec', 'outputs/code_coverage/debugAndroidTest/connected/**/*.ec'
+                        ])
 
                         doLast() {
                             print "file://${reports.html.destination}/index.html"
